@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -99,7 +99,7 @@ vim.g.have_nerd_font = false
 --  For more options, you can see `:help option-list`
 
 -- Make line numbers default
-vim.opt.number = true
+vim.opt.number = false
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 -- vim.opt.relativenumber = true
@@ -122,7 +122,7 @@ end)
 vim.opt.breakindent = true
 
 -- Save undo history
-vim.opt.undofile = true
+vim.opt.undofile = false
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.ignorecase = true
@@ -189,6 +189,16 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+-- Agar's F Keys
+vim.keymap.set('n', '<F1>', '<Esc>')
+--vim.keymap.set('n', '<F3>', ':FZF')
+vim.keymap.set('n', '<F4>', ':set number!<Cr>')
+vim.keymap.set('n', '<F7>', ':set spell! spelllang=en_us wrap! lbr! number!<Cr>')
+vim.keymap.set('n', '<F8>', '<Esc>')
+vim.keymap.set('n', '<F10>', ':qa<Cr>')
+vim.keymap.set('n', '<F11>', '<Esc>')
+vim.keymap.set('n', '<F12>', '<Esc>')
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -404,6 +414,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<F3>', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -451,6 +462,60 @@ require('lazy').setup({
     },
   },
   { 'Bilal2453/luvit-meta', lazy = true },
+  {
+    'mrjones2014/smart-splits.nvim',
+    config = function()
+      -- Smart Split Resizing
+      -- recommended mappings
+      -- resizing splits
+      -- these keymaps will also accept a range,
+      -- for example `10<A-h>` will `resize_left` by `(10 * config.default_amount)`
+      vim.keymap.set('n', '<A-h>', require('smart-splits').resize_left)
+      vim.keymap.set('n', '<A-j>', require('smart-splits').resize_down)
+      vim.keymap.set('n', '<A-k>', require('smart-splits').resize_up)
+      vim.keymap.set('n', '<A-l>', require('smart-splits').resize_right)
+      -- moving between splits
+      vim.keymap.set('n', '<C-h>', require('smart-splits').move_cursor_left)
+      vim.keymap.set('n', '<C-j>', require('smart-splits').move_cursor_down)
+      vim.keymap.set('n', '<C-k>', require('smart-splits').move_cursor_up)
+      vim.keymap.set('n', '<C-l>', require('smart-splits').move_cursor_right)
+      vim.keymap.set('n', '<C-\\>', require('smart-splits').move_cursor_previous)
+      -- swapping buffers between windows
+      vim.keymap.set('n', '<leader><leader>h', require('smart-splits').swap_buf_left)
+      vim.keymap.set('n', '<leader><leader>j', require('smart-splits').swap_buf_down)
+      vim.keymap.set('n', '<leader><leader>k', require('smart-splits').swap_buf_up)
+      vim.keymap.set('n', '<leader><leader>l', require('smart-splits').swap_buf_right)
+    end,
+  },
+  {
+    'nvim-zh/colorful-winsep.nvim',
+    config = function()
+      require('colorful-winsep').setup {
+        -- highlight for Window separator
+        hi = {
+          bg = '#16161E',
+          fg = '#1F3442',
+        },
+        -- This plugin will not be activated for filetype in the following table.
+        no_exec_files = { 'packer', 'TelescopePrompt', 'mason', 'CompetiTest', 'NvimTree' },
+        -- Symbols for separator lines, the order: horizontal, vertical, top left, top right, bottom left, bottom right.
+        symbols = { '━', '┃', '┏', '┓', '┗', '┛' },
+        -- #70: https://github.com/nvim-zh/colorful-winsep.nvim/discussions/70
+        only_line_seq = true,
+        -- Smooth moving switch
+        smooth = true,
+        exponential_smoothing = true,
+        anchor = {
+          left = { height = 1, x = -1, y = -1 },
+          right = { height = 1, x = -1, y = 0 },
+          up = { width = 0, x = -1, y = 0 },
+          bottom = { width = 0, x = 1, y = 0 },
+        },
+        light_pollution = function(lines) end,
+      }
+    end,
+    event = { 'WinLeave' },
+  },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -919,10 +984,10 @@ require('lazy').setup({
   --
   -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
+  require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
